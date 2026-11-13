@@ -75,3 +75,7 @@ node scripts/run_multimodal_demo.mjs \
 ## License
 
 [MIT](LICENSE)
+
+## 已生成的实测成片样本
+
+- [样本 01：五年级小数乘法 `0.3 × 0.2 = 0.06`（78s）](samples/01-decimal-0.3x0.2/README.md) · [直接下载 MP4（Release v0.5.0）](https://github.com/siuserxiaowei/ling-math-demo/releases/download/v0.5.0/decimal-0.3x0.2-78s.mp4)
