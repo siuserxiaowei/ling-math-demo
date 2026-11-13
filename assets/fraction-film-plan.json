@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "title": "为什么3/4÷1/2等于一又二分之一",
+  "topic": "分数除法：同单位条分组与余量折算",
+  "audience": "小学高年级，已认识分数并能进行同分母比较的学习者",
+  "segments": [
+    {
+      "id": "s01",
+      "text": "3/4÷1/2等于多少？",
+      "spokenText": "四分之三除以二分之一，商是多少？",
+      "visual": {
+        "scene": "number-line",
+        "example": "A",
+        "stage": "question",
+        "description": "竖屏顶部居中显示算式3/4÷1/2=?；下方一条灰色长条表示原单位1，右端标1，中间用细虚线预留四等分与二等分位置但不填色；问题文字用深蓝色，问题框不写答案。"
+      }
+    },
+    {
+      "id": "s02",
+      "text": "先把单位1四等分。",
+      "spokenText": "先把原单位一平均分成四格，每格是四分之一。",
+      "visual": {
+        "scene": "number-line",
+        "example": "A",
+        "stage": "units",
+        "description": "同一根长条被三条等距竖线分成4格，每格宽1/4；格下依次标1/4、2/4、3/4、4/4，右端仍标1；此刻只画灰色格子，不涂蓝不画橙。"
+      }
+    },
+    {
+      "id": "s03",
+      "text": "蓝色已有3格。",
+      "spokenText": "涂蓝其中三格，就是四分之三。",
+      "visual": {
+        "scene": "number-line",
+        "example": "A",
+        "stage": "units",
+        "description": "前3格填蓝色，第4格保持浅灰；蓝色区域上方标3/4，3/4由3个1/4相加得到；每格下方仍保留1/4刻度，蓝色面积与口播的3格一致。"
+      }
+    },
+    {
+      "id": "s04",
+      "text": "每组要占2格。",
+      "spokenText": "每组取二分之一，也就是占两格。",
+      "visual": {
+        "scene": "number-line",
+        "example": "A",
+        "stage": "groups",
+        "description": "在已画四等分的长条上叠加一条橙色括号，罩住第1至第2格，旁标每组=1/2=2格；橙色括号宽度与两格总宽相同，不盖住蓝色底色，只说明组的大小。"
+      }
+    },
+    {
+      "id": "s05",
+      "text": "正好放下1整组。",
+      "spokenText": "前两个蓝格正好装下一整组。",
+      "visual": {
+        "scene": "number-line",
+        "example": "A",
+        "stage": "groups",
+        "description": "第1至第2格外加橙色粗框并标整组1；第3格仍为蓝格且无橙框；整组1的位置对应原单位1/2，旁注2个1/4。画面只增加整组框，不移动蓝格。"
+      }
+    },
+    {
+      "id": "s06",
+      "text": "还剩1个蓝格。",
+      "spokenText": "还剩下一格，是原单位的四分之一。",
+      "visual": {
+        "scene": "number-line",
+        "example": "A",
+        "stage": "remainder",
+        "description": "第3格单独用浅橙色半透明框出，标余量=1/4；第1至第2格的橙色整组框保留；浅橙余量宽度等于1格，不等于原单位1/2，避免把余半组说成余半根。"
+      }
+    },
+    {
+      "id": "s07",
+      "text": "余量是每组的一半。",
+      "spokenText": "这格余量是二分之一的一半，所以是半组。",
+      "visual": {
+        "scene": "number-line",
+        "example": "A",
+        "stage": "remainder",
+        "description": "在第3格与整组之间画对应箭头：整组宽2格标1/2，余量宽1格标1/4，并写1/4是1/2的一半，即半组；半组二字高亮，箭头只连接同一条长条上的两段宽度。"
+      }
+    },
+    {
+      "id": "s08",
+      "text": "1整组加半组。",
+      "spokenText": "一整组再加半组，共一又二分之一组。",
+      "visual": {
+        "scene": "number-line",
+        "example": "A",
+        "stage": "conclusion",
+        "description": "整组框旁标1，半组框旁标1/2，二者上方合成一条短括号标1又1/2组；下方同步写3/4÷1/2=3/2=1又1/2，组数写在算式右侧，不与原单位1的长度混淆。"
+      }
+    },
+    {
+      "id": "s09",
+      "text": "换2/3÷1/6验证。",
+      "spokenText": "再用三分之二除以六分之一检查。",
+      "visual": {
+        "scene": "number-line",
+        "example": "B",
+        "stage": "question",
+        "description": "画面切换到同长度新单位条，仍标原单位1；顶部写2/3÷1/6=?，先不涂色；长条旁用细虚线预留6个等分位，风格与例A相同。"
+      }
+    },
+    {
+      "id": "s10",
+      "text": "单位1六等分。",
+      "spokenText": "把单位一平均分成六格，每格是六分之一。",
+      "visual": {
+        "scene": "number-line",
+        "example": "B",
+        "stage": "units",
+        "description": "长条被五条竖线分成6格，每格宽1/6；格下标1/6至6/6，右端标1；只画灰格与刻度，不涂蓝不画橙，保证与例A同一长度尺度。"
+      }
+    },
+    {
+      "id": "s11",
+      "text": "蓝色占4格。",
+      "spokenText": "涂蓝其中四格，就是三分之二。",
+      "visual": {
+        "scene": "number-line",
+        "example": "B",
+        "stage": "units",
+        "description": "前4格填蓝色，后2格浅灰；蓝色上方标2/3，并注明2/3=4/6；每格宽仍为1/6，蓝色覆盖4格，与口播数量一致。"
+      }
+    },
+    {
+      "id": "s12",
+      "text": "每组只有1格。",
+      "spokenText": "每组取六分之一，正好占一格。",
+      "visual": {
+        "scene": "number-line",
+        "example": "B",
+        "stage": "groups",
+        "description": "第1格外加橙色框并标每组=1/6=1格；橙色框只罩1格，宽窄与一格相同；其余蓝格暂不加框，表示还没有继续分组。"
+      }
+    },
+    {
+      "id": "s13",
+      "text": "4个整组，无余量。",
+      "spokenText": "四个蓝格装下四整组，没有余量。",
+      "visual": {
+        "scene": "number-line",
+        "example": "B",
+        "stage": "conclusion",
+        "description": "4个蓝格分别套上同样的橙色整组框，依次标1、2、3、4；第5至第6格本就不是蓝色，不参与分组；底部写2/3÷1/6=4，并注4个1/6等于4/6即2/3。"
+      }
+    },
+    {
+      "id": "s14",
+      "text": "同单位分组得商。",
+      "spokenText": "同单位条里先数完整组，再把余量按每组大小换算。",
+      "visual": {
+        "scene": "number-line",
+        "example": "A",
+        "stage": "conclusion",
+        "description": "画面并列缩小显示例A与例B：例A为一整组加半组，例B为四整组无余量；中间写规则“除以一个分数=看被除数里能装几个除数”，下方注明条件：同一单位条、完整组与余量都按除数大小换算，余量不一定是半组。"
+      }
+    }
+  ]
+}

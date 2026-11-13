@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-08",
+  "sourceModel": "Ling-3.2-flash",
+  "sourceHTML": "fraction-division-ling.html",
+  "sourceHTMLSha256": "68bde93c564442cc508512b75d64224472994fb6afcbe3385e26f1b027efa505",
+  "basePlanSha256": "077b033c9d5a3ad81d9e3f34a27dae0704319497c13065451d46a8baf9bf4c80",
+  "plan": "fraction-film-plan.json",
+  "planSha256": "f007c2a4bd6eb2ae1b83ba56895e1327562208a48642761ff37d2de3b16b8c61",
+  "hostEditedPlan": true,
+  "edits": [
+    {
+      "segmentId": "s14",
+      "field": "spokenText",
+      "before": "同单位条里先数完整组，再把余量按每组大小换算；本例A的余量恰为半组，B则四组无余量。",
+      "after": "同单位条里先数完整组，再把余量按每组大小换算。",
+      "reason": "删去带内部A/B标识的重复回顾；保留Ling原句的通用规则，避免朗读程序标签。未改变数学结论。"
+    }
+  ],
+  "map": "fraction-film-map.json",
+  "hostComposition": true,
+  "executionOverride": "s14 uses the A final frame rather than the planned A+B side-by-side; spokenText gives the general rule.",
+  "voice": {
+    "provider": "macos-say",
+    "voice": "Tingting",
+    "rate": 155
+  },
+  "verifiedCase": {
+    "durationSeconds": 60.033333,
+    "dimensions": [
+      1080,
+      1920
+    ],
+    "fps": 30,
+    "captionBoundaryFramesChecked": 59,
+    "mathematics": "passed_bounded_two_examples",
+    "audioReview": "chunked ASR; no human listening"
+  },
+  "limits": [
+    "A later Ling plan correction returned HTTP 429; public API requests stopped.",
+    "Official Ming TTS returned HTTP 200 audio/wav with an empty body; the case uses explicitly recorded local Tingting speech.",
+    "The video composition is host work based on real Ling source SVG and derived storyboard; it is not a new model-authored video HTML."
+  ]
+}

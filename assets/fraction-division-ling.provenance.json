@@ -1,0 +1,23 @@
+{
+  "model": "Ling-3.2-flash",
+  "source": "official-api",
+  "date": "2026-11-08",
+  "htmlSha256": "68bde93c564442cc508512b75d64224472994fb6afcbe3385e26f1b027efa505",
+  "successfulScreenshotFeedbackRounds": 4,
+  "hostEditedModelHTML": false,
+  "checkedExamples": [
+    "3/4 ÷ 1/2",
+    "2/3 ÷ 1/6"
+  ],
+  "checkedSeconds": [
+    23.4,
+    31,
+    40,
+    52
+  ],
+  "technicalCheckPassed": true,
+  "mathReview": "passed_bounded_cases",
+  "visualInteractionReview": "passed",
+  "externalResources": false,
+  "notes": "This is an archived real Ling-generated example, not a substitute for new API generation."
+}

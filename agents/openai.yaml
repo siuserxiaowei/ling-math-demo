@@ -1,0 +1,4 @@
+interface:
+  display_name: "百灵教学视频"
+  short_description: "Ling原生看视频学结构、拍错题讲解、看成片挑错，配Ming旁白"
+  default_prompt: "使用 $ling-math-demo，用Ling原生看图看视频，根据孩子的年级和卡点制作原创讲解视频，渲染后核对关键帧与旁白并按上限修订，用百灵配音，留出思考时间，最后用小题检查理解，并附家长或老师使用提示。"

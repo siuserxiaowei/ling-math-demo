@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>分数除法：量一量</title>
+<style>
+  :root{
+    --teal:#0e9488; --teal-dark:#0b6e66; --teal-soft:#e3f4f0;
+    --apricot:#ee6c4d; --apricot-dark:#c2492c; --apricot-soft:#ffe9df;
+    --paper:#fffaf2; --ink:#3b332a; --muted:#8a7f70; --line:#e9ddc9;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;}
+  #app{max-width:800px;margin:0 auto;padding:18px 14px 40px;}
+  h1{font-size:24px;margin:6px 0 4px;}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:10px;line-height:1.6;}
+  .stage-title{font-size:17px;font-weight:700;color:var(--teal-dark);margin:8px 0 6px;min-height:26px;}
+  .svg-wrap{border:1px solid var(--line);border-radius:14px;background:#fffdf8;padding:6px;}
+  svg{display:block;width:100%;height:auto;}
+  .explain{font-size:16px;line-height:1.7;background:#fff;border:1px solid var(--line);
+    border-radius:12px;padding:12px 14px;margin-top:10px;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+  .formula{font-size:20px;font-weight:700;color:var(--apricot-dark);margin-top:10px;min-height:28px;}
+  .legend{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.6;}
+  .legend .sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin:0 4px 0 10px;vertical-align:-1px;}
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px;
+    background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;}
+  .controls button{font-size:15px;padding:10px 16px;min-height:44px;border-radius:10px;border:1px solid var(--line);
+    background:var(--teal-soft);color:var(--teal-dark);cursor:pointer;font-family:inherit;}
+  .controls button[aria-pressed="true"]{background:var(--teal);color:#fff;border-color:var(--teal);}
+  .controls label{font-size:14px;color:var(--muted);display:flex;align-items:center;gap:6px;}
+  input[type=range]{flex:1;min-width:140px;height:44px;accent-color:var(--teal);cursor:pointer;}
+  .time-read{font-size:14px;color:var(--muted);min-width:86px;text-align:right;font-variant-numeric:tabular-nums;}
+  .example-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+
+  /* ---- 视频模式：1080×1920 竖屏 ---- */
+  body.video{background:#fffaf2;}
+  body.video #app{max-width:1080px;padding:56px 60px 40px;}
+  body.video h1{font-size:64px;margin:0 0 10px;}
+  body.video .sub{font-size:34px;margin-bottom:22px;}
+  body.video .stage-title{font-size:36px;margin:6px 0 14px;}
+  body.video .svg-wrap{max-width:920px;margin:0 auto;padding:10px;}
+  body.video .explain{font-size:42px;line-height:1.55;padding:22px 26px;margin-top:18px;}
+  body.video .formula{font-size:64px;margin-top:16px;}
+  body.video .legend{font-size:26px;}
+  body.video .controls{display:none;}
+</style>
+</head>
+<body>
+<div id="app">
+  <h1>分数除法：量一量</h1>
+  <div class="sub" id="subtitle">3/4里包含几个1/2？</div>
+  <div class="stage-title" id="stage-title">引入问题</div>
+  <div class="svg-wrap">
+    <svg id="main-svg" viewBox="0 0 360 360" role="img" aria-label="分数除法单位条度量图"></svg>
+  </div>
+  <div class="explain" id="explain-text" aria-live="polite"></div>
+  <div class="formula" id="formula-line"></div>
+  <div class="legend">颜色含义：<span class="sw" style="background:#0e9488"></span>蓝色＝被除数（已有量）<span class="sw" style="background:#ee6c4d"></span>橙色＝每组大小（除数）<span class="sw" style="background:#f6c9b8"></span>浅橙＝余量</div>
+
+  <div class="controls" id="controls">
+    <button id="btn-play" aria-label="播放或暂停">▶ 播放</button>
+    <button id="btn-reset" aria-label="重置到开始">↺ 重置</button>
+    <label for="seek">进度
+      <input id="seek" type="range" min="0" max="52" step="0.05" value="0" aria-label="讲解进度（秒）">
+    </label>
+    <span class="time-read" id="time-read">0.0 / 52 秒</span>
+    <div class="example-row">
+      <span style="font-size:14px;color:var(--muted)">例子</span>
+      <button id="ex1" aria-pressed="true" data-math="3/4 ÷ 1/2 = 1又1/2">¾ ÷ ½ = 1½</button>
+      <button id="ex2" aria-pressed="false" data-math="2/3 ÷ 1/6 = 4">²⁄₃ ÷ ¹⁄₆ = 4</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var DURATION = 52;
+  var VW = 360;          // 逻辑视口宽
+  var UNIT_W = 320;        // 原单位 1 的宽（数学长度统一按此尺度）
+  var BAR_X = 20;          // 所有条形左对齐 x=20
+
+  function gcd(a,b){ a=Math.abs(a); b=Math.abs(b); while(b){var t=a%b;a=b;b=t;} return a||1; }
+  function lcm(a,b){ return a/gcd(a,b)*b; }
+
+  // 由 p/q ÷ s/t 统一计算全部数学数据
+  function buildExample(p,q,s,t,name){
+    var L = lcm(q,t);
+    var A = p*L/q;        // 被除数占 A 个 1/L 小格
+    var B = s*L/t;        // 除数（每组）占 B 个 1/L 小格
+    var gN = Math.floor(A/B), r = A % B;
+    var g = gcd(A,B);
+    return {
+      id:name, p:p, q:q, s:s, t:t, L:L, A:A, B:B,
+      gN:gN, r:r,
+      qN:A/g, qD:B/g,
+      aTxt:p+"/"+q, bTxt:s+"/"+t,
+      qTxt:(A%B===0)?String(gN):(gN>0? gN+"又"+(r/g)+"/"+(B/g) : (r/g)+"/"+(B/g)),
+      dec:(A/B)
+    };
+  }
+  var EXAMPLES = {
+    A: buildExample(3,4,1,2,"A"),
+    B: buildExample(2,3,1,6,"B")
+  };
+  var ex = EXAMPLES.A;
+
+  var time = 0, playing = false, lastStamp = null;
+
+  function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+  function ease(x){ x=clamp(x,0,1); return x*x*(3-2*x); }
+  function fmt(x){ return (Math.round(x*10)/10).toString(); }
+
+  var TEAL="#0e9488", TEAL_D="#0b6e66", APRICOT="#ee6c4d", APRICOT_D="#c2492c",
+      INK="#3b332a", MUTED="#8a7f70", REM="#f6c9b8";
+
+  // 分段时间轴（每例通用）
+  function stageOf(t){
+    if(t < 4)  return {n:0, name:"引入问题"};
+    if(t < 14) return {n:1, name:"统一小格"};
+    if(t < 26) return {n:2, name:"量出整组"};
+    if(t < 36) return {n:3, name:"余量占一份多少"};
+    if(t < 46) return {n:4, name:"得到商"};
+    return {n:5, name:"总结"};
+  }
+
+  function ratioStr(num,den){
+    var g = gcd(num,den);
+    return (num/g) + "/" + (den/g);
+  }
+
+  function currentText(t){
+    if(t < 4)  return "问题：" + ex.aTxt + " ÷ " + ex.bTxt + " 是多少？想一想：" + ex.aTxt + " 里包含几个 " + ex.bTxt + "？";
+    if(t < 14) return "固定同一把单位 1 的尺子：蓝色是已有的 " + ex.aTxt + "（" + ex.A + " 个 1/" + ex.L + "），橙色是每份大小 " + ex.bTxt + "（" + ex.B + " 个 1/" + ex.L + "）。";
+    if(t < 26) return "拿除数去量被除数：每份宽 " + ex.B + " 格，一共能量出 " + ex.gN + " 个完整组" + (ex.r>0 ? "，还剩下 " + ex.r + " 格。" : "，正好量完。");
+    if(t < 36){
+      if(ex.r>0) return "剩下的 " + ex.r + " 格用同一把尺子比：占一份 " + ex.B + " 格的 " + ratioStr(ex.r,ex.B) + "（即原单位的 " + ratioStr(ex.r,ex.L) + "），所以商是 " + ex.gN + " 又 " + ratioStr(ex.r,ex.B) + "。";
+      return "没有剩余：" + ex.A + " 格正好是 " + ex.B + " 格一份的 " + ex.gN + " 倍，商就是整数 " + ex.gN + "。";
+    }
+    if(t < 46) return "合起来：" + ex.aTxt + " ÷ " + ex.bTxt + " = " + ex.A + "÷" + ex.B + " = " + ex.qN + "/" + ex.qD + " = " + ex.qTxt + "。注意“商”的单位是组，与原单位长度不同。";
+    return "结论：" + ex.aTxt + " ÷ " + ex.bTxt + " = " + ex.qTxt + "。" + (ex.r>0 ? "余下的 " + ex.r + " 格占一份的 " + ratioStr(ex.r,ex.B) + "，所以商是带分数。" : "恰好量尽，所以商是整数。") + " 这就是“包含除”：看被除数里包含几个除数。";
+  }
+
+  // ---- SVG：360 宽逻辑视口，图内只放短标签 ----
+  var svg = document.getElementById("main-svg");
+  function el(name, attrs){
+    var n = document.createElementNS("http://www.w3.org/2000/svg", name);
+    for(var k in attrs){ n.setAttribute(k, attrs[k]); }
+    svg.appendChild(n); return n;
+  }
+  function text(x,y,s,size,color,anchor,weight){
+    var t = el("text",{x:x,y:y,"font-size":size,fill:color,"text-anchor":anchor||"start","font-weight":weight||"normal"});
+    t.textContent = s; return t;
+  }
+  // 在 320 宽的原单位尺度上画小格条
+  function cellBar(x,y,cells,h,fill,stroke,key){
+    var w = UNIT_W/ex.L;
+    for(var i=0;i<cells;i++){
+      var r = el("rect",{x:x+i*w, y:y, width:w, height:h, fill:fill, stroke:stroke, "stroke-width":1.2, rx:2});
+      if(key) r.setAttribute("data-math", key);
+    }
+    return w;
+  }
+
+  function render(t){
+    svg.innerHTML = "";
+    var st = stageOf(t);
+
+    // ===== 第 1 行：单位 1 参照 + 蓝色已有量 =====
+    var y1=76, h1=34;
+    text(BAR_X, y1-24, "单位 1（原单位长度）", 17, MUTED);
+    el("rect",{x:BAR_X,y:y1,width:UNIT_W,height:h1,fill:"#fff",stroke:"#d9cbb6","stroke-width":1.4,"stroke-dasharray":"6 4",rx:4,"data-math":"unit"});
+    for(var i=1;i<ex.L;i++){
+      el("line",{x1:BAR_X+i*UNIT_W/ex.L, y1:y1, x2:BAR_X+i*UNIT_W/ex.L, y2:y1+h1, stroke:"#e9ddc9","stroke-width":1});
+    }
+    var p1 = ease((t-1.5)/2.5);
+    if(p1>0){
+      cellBar(BAR_X, y1, ex.A, h1, TEAL, TEAL_D, "dividend");
+      if(p1<1){
+        el("rect",{x:BAR_X, y:y1, width:UNIT_W*p1, height:h1, fill:"none", stroke:TEAL_D, "stroke-width":2.4, rx:4});
+      }
+    }
+    text(BAR_X, y1+h1+18, "已有 "+ex.aTxt+" = "+ex.A+" 个 1/"+ex.L, 17, TEAL_D);
+    text(BAR_X+UNIT_W+6, y1+h1/2+6, "1", 17, MUTED, "start");
+
+    // ===== 第 2 行：橙色每组（除数） =====
+    var y2=158, h2=30;
+    var p2 = ease((t-4)/6);
+    if(p2>0){
+      text(BAR_X, y2-8, "每组 "+ex.bTxt+" = "+ex.B+" 个 1/"+ex.L, 17, APRICOT_D);
+      cellBar(BAR_X, y2, ex.B, h2, APRICOT, APRICOT_D, "divisor");
+      text(BAR_X, y2+h2+18, "一份的宽 = "+ex.B+" 格", 17, APRICOT_D);
+      if(p2>0.4){
+        var ax = BAR_X + ex.B*UNIT_W/ex.L;
+        el("line",{x1:ax,y1:y2+h2+4,x2:ax,y2:y2+h2+12,stroke:APRICOT,"stroke-width":2});
+        el("polygon",{points:(ax-4)+","+(y2+h2+10)+" "+(ax+4)+","+(y2+h2+10)+" "+ax+","+(y2+h2+17), fill:APRICOT});
+      }
+    }
+
+    // ===== 第 3 行：并排整组与余量 =====
+    var y3=238, h3=30;
+    var p3 = ease((t-14)/12);
+    if(p3>0){
+      var wcell = UNIT_W/ex.L;
+      for(var gi=0; gi<ex.gN; gi++){
+        var gx = BAR_X + gi*ex.B*wcell;
+        el("rect",{x:gx, y:y3, width:ex.B*wcell, height:h3, fill:APRICOT, stroke:APRICOT_D, "stroke-width":1.4, rx:3, "data-math":"group"});
+        text(gx+ex.B*wcell/2, y3+h3/2+6, String(gi+1), 17, "#fff", "middle", "bold");
+      }
+      text(BAR_X, y3-8, ex.r>0 ? (ex.gN+" 整组，余 "+ex.r+" 格") : (ex.gN+" 整组，正好量完"), 17, APRICOT_D);
+      if(ex.r>0){
+        var rx = BAR_X + ex.gN*ex.B*wcell;
+        el("rect",{x:rx, y:y3, width:ex.r*wcell, height:h3, fill:REM, stroke:APRICOT_D, "stroke-width":1.4, rx:3, "stroke-dasharray":"5 3", "data-math":"remainder"});
+        text(rx+ex.r*wcell/2, y3+h3/2+6, "余", 17, APRICOT_D, "middle", "bold");
+        // 31 秒起余量标签立即出现（不再用阈值隐藏），仅用强调框做动画
+        if(t>=31){
+          el("rect",{x:rx-3, y:y3-3, width:ex.r*wcell+6, height:h3+6, fill:"none", stroke:APRICOT_D, "stroke-width":2.2, rx:5, "stroke-dasharray":"6 4"});
+        }
+      }
+    }
+
+    // ===== 第 4 行：仅解释余量占每组比例 / 正好量完 =====
+    var y4=306, h4=30;
+    var p4 = ease((t-26)/10);
+    if(p4>0){
+      if(ex.r>0){
+        text(BAR_X, y4-8, "余量占每组", 17, APRICOT_D);
+        el("rect",{x:BAR_X, y:y4, width:ex.B*UNIT_W/ex.L, height:h4, fill:"#fff", stroke:APRICOT_D, "stroke-width":1.4, "stroke-dasharray":"6 4", rx:4});
+        el("rect",{x:BAR_X, y:y4, width:ex.r*UNIT_W/ex.L, height:h4, fill:REM, stroke:APRICOT_D, "stroke-width":1.4, rx:4, "data-math":"remainder"});
+        text(BAR_X, y4+h4+18, "余 1 格 = 半组", 17, APRICOT_D);
+      }else{
+        text(BAR_X, y4+h4/2+6, ex.A+" 格正好是 "+ex.B+" 格一份的 "+ex.gN+" 倍，量完了。", 17, TEAL_D);
+      }
+    }
+
+    // （SVG 到第 4 行结束；完整等式在外部 #formula-line，图内不再重复绘制结论框）
+  }
+
+  // ---- 公共接口 ----
+  function setTime(sec){
+    time = clamp(sec, 0, DURATION);
+    render(time);
+    var st = stageOf(time);
+    document.getElementById("stage-title").textContent = "阶段 " + (st.n+1) + "/6 · " + st.name;
+    document.getElementById("explain-text").textContent = currentText(time);
+    document.getElementById("formula-line").textContent = ex.aTxt + " ÷ " + ex.bTxt + " = " + ex.qTxt;
+    document.getElementById("time-read").textContent = fmt(time) + " / " + DURATION + " 秒";
+    var seek = document.getElementById("seek");
+    if(seek && document.activeElement!==seek) seek.value = time;
+  }
+
+  function setExample(id){
+    ex = EXAMPLES[id];
+    document.getElementById("ex1").setAttribute("aria-pressed", id==="A" ? "true":"false");
+    document.getElementById("ex2").setAttribute("aria-pressed", id==="B" ? "true":"false");
+    document.getElementById("subtitle").textContent = ex.aTxt + "里包含几个" + ex.bTxt + "？";
+    setTime(time);
+  }
+
+  window.lesson = {
+    duration: DURATION,
+    setTime: setTime,
+    inspect: function(){
+      var st = stageOf(time);
+      return {
+        topic: "分数除法·包含除（单位条度量）",
+        time: time,
+        stage: st.name,
+        example: { id: ex.id, p: ex.p, q: ex.q, s: ex.s, t: ex.t },
+        L: ex.L, A: ex.A, B: ex.B,
+        wholeGroups: ex.gN, remainderCells: ex.r,
+        remainderPerGroup: ex.r + "/" + ex.B,
+        quotient: { num: ex.qN, den: ex.qD, text: ex.qTxt, value: ex.dec },
+        unitWidth: UNIT_W,
+        currentText: currentText(time)
+      };
+    }
+  };
+
+  // ---- 控件 ----
+  var btnPlay = document.getElementById("btn-play");
+  var btnReset = document.getElementById("btn-reset");
+  var seek = document.getElementById("seek");
+  var ex1 = document.getElementById("ex1");
+  var ex2 = document.getElementById("ex2");
+
+  btnPlay.addEventListener("click", function(){
+    playing = !playing;
+    btnPlay.textContent = playing ? "⏸ 暂停" : "▶ 播放";
+    if(playing && time >= DURATION){ time = 0; }
+    lastStamp = null;
+  });
+  btnReset.addEventListener("click", function(){
+    playing = false; btnPlay.textContent = "▶ 播放";
+    setTime(0);
+  });
+  seek.addEventListener("input", function(){
+    playing = false; btnPlay.textContent = "▶ 播放";
+    setTime(parseFloat(seek.value));
+  });
+  ex1.addEventListener("click", function(){ setExample("A"); });
+  ex2.addEventListener("click", function(){ setExample("B"); });
+
+  // ---- 播放循环（确定性时间函数驱动） ----
+  var videoMode = /[?&]video=1/.test(location.search);
+  var rafId = null;
+  function loop(stamp){
+    if(lastStamp === null) lastStamp = stamp;
+    var dt = (stamp - lastStamp)/1000;
+    lastStamp = stamp;
+    if(playing){
+      time += dt;
+      if(time >= DURATION){ time = DURATION; playing = false; btnPlay.textContent = "▶ 播放"; }
+      setTime(time);
+    }
+    rafId = requestAnimationFrame(loop);
+  }
+
+  if(videoMode){
+    document.body.classList.add("video");
+    document.getElementById("app").style.maxWidth = "1080px";
+    document.getElementById("app").style.margin = "0 auto";
+    setTime(0);
+  } else {
+    setTime(0);
+    rafId = requestAnimationFrame(loop);
+  }
+})();
+</script>
+</body>
+</html>
